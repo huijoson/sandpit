@@ -1,4 +1,27 @@
+var charCircles = function(data) {
+  var chart = d3.select('#chart');
+  // 使用data來設定圖表的高度與寬度
+  chart.attr('height', data.height).attr('width', data.width);
+  // 使用data建立一些圖形
+  chart.selectAll('circle').data(data.circles)
+      .enter()
+      .append('circle')
+      .attr('cx', function(d) {return d.x})
+      .attr('cy', function(d) {return d.y})
+      .attr('r', function(d) { return d.r});
+};
 
+var data = {
+  width: 300, height:150,
+  circles: [
+    {'x': 50, 'y':30, 'r':20},
+    {'x':70, 'y':80, 'r':10},
+    {'x':160, 'y': 60, 'r':10},
+    {'x':200, 'y': 100, 'r':5},
+  ]
+};
+
+charCircles(data);
 // var data = [3, 7, 2, 9, 1, 11];
 // var sum = 0;
 // data.forEach(function (d){
@@ -60,29 +83,29 @@
 // console.log(sum)
 
 //closure
-function Counter(inc){
-  var count = 0;
-  var api = {};
-  api.add = function (){
-    count+=inc;
-    console.log(
-      'Current count: ' + count);
-  }
-
-  api.sub = function (){
-    count -= inc;
-    console.log('Current count: ' + count);
-  }
-
-  api.reset = function(){
-    count = 0;
-    console.log('Count reset to 0')
-  }
-  return api;
-}
-cntr = Counter(3);
-cntr.add()
-cntr.add()
-cntr.add()
-cntr.sub()
-cntr.reset()
+// function Counter(inc){
+//   var count = 0;
+//   var api = {};
+//   api.add = function (){
+//     count+=inc;
+//     console.log(
+//       'Current count: ' + count);
+//   }
+//
+//   api.sub = function (){
+//     count -= inc;
+//     console.log('Current count: ' + count);
+//   }
+//
+//   api.reset = function(){
+//     count = 0;
+//     console.log('Count reset to 0')
+//   }
+//   return api;
+// }
+// cntr = Counter(3);
+// cntr.add()
+// cntr.add()
+// cntr.add()
+// cntr.sub()
+// cntr.reset()

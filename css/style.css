@@ -1,0 +1,73 @@
+
+body{
+    background: #cccccc;
+    font-family: sans-serif;
+}
+
+div.dev {
+    border: solid 1px green;
+}
+
+div#chart-holder {
+    height: 600px;
+    position: relative;
+}
+
+div#chart-components {
+    height: 400px;
+    position:relative;
+}
+
+div#main, div#sidebar {
+    position: absolute;
+}
+
+div#main {
+    width:75%;
+    height: 100%;
+    background: #eeeeee;
+}
+
+div#sidebar {
+    right: 0;
+    width: 25%;
+    height: 100%;
+}
+#chart circle {
+    /*fill: lightblue;*/
+}
+
+#chart line {
+    stroke: #555555;
+    stroke-width: 2;
+}
+
+#chart rect {
+    stroke: red;
+    fill: white;
+}
+
+#chart polygon {
+    fill: green;
+}
+
+#chart line#total {
+    stroke: red;
+    stroke-width: 3px;
+    opacity: 0.5;
+}
+
+#chart {
+    background: #eeeeee;
+    font-family: sans-serif;
+}
+
+#chart text {
+    font-size: 16px;
+}
+
+#chart text#title {
+    font-size: 18px;
+}
+
+#chart path {stroke: red; fill: none;}

@@ -2,40 +2,38 @@ import csv
 import json
 from collections import Counter, defaultdict
 import datetime
+
+import dataset
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Enum
 from sqlalchemy.orm import sessionmaker
-
-engine = create_engine( \
-    'sqlite:///data/nobel_prize.db', echo=True)
-Base = declarative_base()
+from pymongo import MongoClient
 
 
-class Winner(Base):
-    __tablename__ = 'winners'
-    id = Column(Integer, primary_key=True)
-    name = Column(String)
-    category = Column(String)
-    year = Column(Integer)
-    nationality = Column(String)
-    sex = Column(Enum('male', 'female'))
-
-    def __repr__(self):
-        return "<Winner(name='%s', category='%s', year='%s')>" \
-               % (self.name, self.category, self.year)
+def get_mongo_database(db_name, host='localhost', \
+                       port=27017, username=None, password=None):
+    # setting connection
+    if username and password:
+        mongo_uri = 'mongodb://%s:%s@%s%s' % \
+                    (username, password, host, db_name)
+        conn = MongoClient(mongo_uri)
+    else:
+        conn = MongoClient(host, port)
+    return conn[db_name]
 
 
-def inst_to_dict(inst, delete_id=True):
-    dat = {}
-    for column in inst.__table__.columns:
-        dat[column.name] = getattr(inst, column.name)
-    if delete_id:
-        dat.pop('id')
-    return dat
+def mongo_coll_to_dicts(dbname='test', collname='test', \
+                        query={}, del_id=True, **kw):
+    db = get_mongo_database(dbname, **kw)
+    res = list(db[collname].find(query))
 
+    if del_id:
+        for r in res:
+            r.pop('_id')
 
-Base.metadata.create_all(engine)
+    return res
+
 
 if __name__ == '__main__':
     nobel_winners = [
@@ -55,12 +53,47 @@ if __name__ == '__main__':
          'sex': 'female',
          'year': 1911}
     ]
+    DB_NOBEL_PRIZE = 'nobel_prize'
+    COLL_WINNERS = 'winners'
+    db = get_mongo_database(DB_NOBEL_PRIZE)
+    coll = db[COLL_WINNERS]
+    # coll.insert_many(nobel_winners)
+    # res = coll.find({'category': 'Chemistry'})
+    # print(list(res))
+    res = coll.find({'year': {'$gt': 1930}})
+    print(list(res))
+
+    res = coll.find({'$or': [{'year': {'$gt': 1930}}, \
+                             {'sex': 'female'}]})
+    print(list(res))
+
+    print(list(mongo_coll_to_dicts(DB_NOBEL_PRIZE, COLL_WINNERS)))
+    d = datetime.datetime.now()
+    print(d.isoformat())
+
+    # db = dataset.connect('sqlite:///data/nobel_prize.db')
+    # winners = db['winners'].find()
+    # datafreeze.freeze(winners, format='csv', \
+    #                   filename='data/nobel_winners_ds.csv')
+    # open('data/nobel_winners_ds.csv')
+    # with db as tx:
+    #     for w in nobel_winners:
+    #         tx['winners'].insert(w)
+    #     print(list(db['winners'].find()))
+    # wtable = db['winners']
+    # winners = wtable.find()
+    # winners = list(winners)
+    # print(winners)
+    # wtable.drop()
+    #
+    # wtable = db['winners']
+    # print(wtable.find())
 
     # create session
-    Session = sessionmaker(bind=engine)
-    session = Session()
-    session.query(Winner).filter_by(name='Albert Einstein').delete()
-    print(list(session.query(Winner)))
+    # Session = sessionmaker(bind=engine)
+    # session = Session()
+    # session.query(Winner).filter_by(name='Albert Einstein').delete()
+    # print(list(session.query(Winner)))
     # winner_rows = session.query(Winner)
     # nobel_winners = [inst_to_dict(w) for w in winner_rows]
     # # print(nobel_wrint(session.dirty)
